@@ -1,4 +1,4 @@
-import { Smile, Frown, Users, MapPin, PartyPopper, PawPrint, Grid3x3 } from "lucide-react";
+import { Smile, Frown, Users, MapPin, PartyPopper, PawPrint, Grid3x3, Angry } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,6 +12,7 @@ const categories = [
   { id: "all", label: "All Photos", icon: Grid3x3, color: "text-primary" },
   { id: "happy", label: "Happy", icon: Smile, color: "text-[hsl(var(--happy))]" },
   { id: "sad", label: "Sad", icon: Frown, color: "text-[hsl(var(--sad))]" },
+  { id: "angry", label: "Angry", icon: Angry, color: "text-[hsl(var(--angry))]" },
   { id: "family", label: "Family", icon: Users, color: "text-[hsl(var(--family))]" },
   { id: "places", label: "Places", icon: MapPin, color: "text-[hsl(var(--places))]" },
   { id: "events", label: "Events", icon: PartyPopper, color: "text-[hsl(var(--events))]" },

@@ -41,6 +41,7 @@ All colors MUST be HSL.
     /* AI & Category Colors */
     --happy: 45 93% 58%;
     --sad: 217 91% 60%;
+    --angry: 0 84% 60%;
     --family: 340 82% 52%;
     --places: 142 76% 36%;
     --events: 280 89% 60%;

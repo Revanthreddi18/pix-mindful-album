@@ -8,6 +8,7 @@ import ImageUploader from "@/components/ImageUploader";
 import CategoryFilter from "@/components/CategoryFilter";
 import PhotoGallery from "@/components/PhotoGallery";
 import AuthForm from "@/components/AuthForm";
+import DemoPhotos from "@/components/DemoPhotos";
 import { Button } from "@/components/ui/button";
 import { LogOut, Loader2 } from "lucide-react";
 
@@ -158,7 +159,12 @@ const Index = () => {
   }
 
   if (!user) {
-    return <AuthForm />;
+    return (
+      <>
+        <AuthForm />
+        <DemoPhotos />
+      </>
+    );
   }
 
   const filteredPhotos =

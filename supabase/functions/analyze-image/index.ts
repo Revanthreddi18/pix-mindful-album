@@ -35,6 +35,7 @@ serve(async (req) => {
 Categories:
 - "happy": Photos with smiling faces, laughter, joyful expressions, celebrations
 - "sad": Photos with sad expressions, crying, somber mood, emotional moments
+- "angry": Photos with angry or frustrated expressions, tension, conflict
 - "family": Photos with family members, groups of people, relatives together
 - "places": Travel photos, landscapes, landmarks, scenic views, architecture
 - "events": Parties, celebrations, birthdays, weddings, gatherings
