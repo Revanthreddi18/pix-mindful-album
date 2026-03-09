@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { Upload, Image as ImageIcon } from "lucide-react";
+import { Upload, Image as ImageIcon, CloudUpload } from "lucide-react";
 import { useDropzone } from "react-dropzone";
+import { motion } from "framer-motion";
 
 interface ImageUploaderProps {
   onUpload: (files: File[]) => void;
@@ -13,48 +14,60 @@ const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.webp']
-    },
+    accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] },
     multiple: true,
   });
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       {...getRootProps()}
       className={`
-        relative border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer
-        transition-all duration-300 hover:border-primary hover:bg-primary/5
-        ${isDragActive ? 'border-primary bg-primary/10 scale-105' : 'border-border'}
+        relative rounded-3xl p-14 text-center cursor-pointer overflow-hidden
+        transition-all duration-500
+        ${isDragActive
+          ? "scale-[1.02] shadow-glow"
+          : "shadow-card hover:shadow-lg"
+        }
       `}
     >
+      {/* Gradient border effect */}
+      <div className="absolute inset-0 rounded-3xl gradient-border" />
+      <div className={`absolute inset-[1px] rounded-3xl transition-colors duration-300 ${isDragActive ? "bg-primary/5" : "bg-card"}`} />
+
       <input {...getInputProps()} />
-      
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
-          <div className="relative bg-gradient-to-br from-primary to-accent p-6 rounded-2xl">
+
+      <div className="relative flex flex-col items-center gap-5">
+        <motion.div
+          animate={isDragActive ? { scale: 1.1, y: -5 } : { scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300 }}
+          className="relative"
+        >
+          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+          <div className="relative p-5 rounded-2xl" style={{ background: "var(--gradient-primary)" }}>
             {isDragActive ? (
-              <ImageIcon className="w-12 h-12 text-white animate-bounce" />
+              <CloudUpload className="w-10 h-10 text-white" />
             ) : (
-              <Upload className="w-12 h-12 text-white" />
+              <Upload className="w-10 h-10 text-white" />
             )}
           </div>
-        </div>
+        </motion.div>
 
         <div>
-          <p className="text-lg font-semibold mb-2">
+          <p className="text-xl font-bold font-display mb-2">
             {isDragActive ? "Drop your photos here!" : "Upload Your Photos"}
           </p>
           <p className="text-sm text-muted-foreground">
             Drag & drop images or click to browse
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Supports PNG, JPG, JPEG, WEBP
+          <p className="text-xs text-muted-foreground/60 mt-1">
+            PNG, JPG, JPEG, WEBP
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
