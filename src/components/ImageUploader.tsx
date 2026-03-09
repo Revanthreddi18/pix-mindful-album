@@ -19,10 +19,7 @@ const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <div
       {...getRootProps()}
       className={`
         relative rounded-3xl p-14 text-center cursor-pointer overflow-hidden
