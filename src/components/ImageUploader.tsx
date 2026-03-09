@@ -64,7 +64,7 @@ const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
