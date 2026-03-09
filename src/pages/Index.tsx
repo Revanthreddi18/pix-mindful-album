@@ -26,20 +26,14 @@ const Index = () => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (user) {
-      fetchPhotos();
-    }
+    if (user) fetchPhotos();
   }, [user]);
 
   const fetchPhotos = async () => {
@@ -48,11 +42,8 @@ const Index = () => {
         .from("photos")
         .select("*")
         .order("created_at", { ascending: false });
-
       if (error) throw error;
       setPhotos(data || []);
-      
-      // Calculate category counts
       const counts: Record<string, number> = {};
       data?.forEach((photo) => {
         counts[photo.category] = (counts[photo.category] || 0) + 1;
@@ -60,38 +51,24 @@ const Index = () => {
       setCategoryCounts(counts);
     } catch (error: any) {
       toast.error("Failed to load photos");
-      console.error(error);
     }
   };
 
   const analyzeAndUploadImage = async (file: File | Blob, fileName: string) => {
     if (!user) return;
-
     try {
-      // Upload to storage
       const filePath = `${user.id}/${Date.now()}-${fileName}`;
-      const { error: uploadError } = await supabase.storage
-        .from("photos")
-        .upload(filePath, file);
-
+      const { error: uploadError } = await supabase.storage.from("photos").upload(filePath, file);
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("photos")
-        .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.from("photos").getPublicUrl(filePath);
 
-      // Analyze image with AI
       const { data: analysisData, error: analysisError } = await supabase.functions.invoke(
         "analyze-image",
-        {
-          body: { imageUrl: publicUrl },
-        }
+        { body: { imageUrl: publicUrl } }
       );
-
       if (analysisError) throw analysisError;
 
-      // Save to database
       const { error: dbError } = await supabase.from("photos").insert({
         user_id: user.id,
         file_path: filePath,
@@ -99,14 +76,12 @@ const Index = () => {
         category: analysisData.category || "happy",
         ai_analysis: analysisData,
       });
-
       if (dbError) throw dbError;
 
       toast.success(`Photo categorized as "${analysisData.category}"!`);
       fetchPhotos();
     } catch (error: any) {
       toast.error("Failed to upload photo");
-      console.error(error);
     }
   };
 
@@ -128,20 +103,13 @@ const Index = () => {
     try {
       const photo = photos.find((p) => p.id === photoId);
       if (!photo) return;
-
-      // Delete from storage
       await supabase.storage.from("photos").remove([photo.file_path]);
-
-      // Delete from database
       const { error } = await supabase.from("photos").delete().eq("id", photoId);
-
       if (error) throw error;
-
       toast.success("Photo deleted");
       fetchPhotos();
     } catch (error: any) {
       toast.error("Failed to delete photo");
-      console.error(error);
     }
   };
 
@@ -152,8 +120,13 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center animate-pulse" style={{ background: "var(--gradient-primary)" }}>
+            <Loader2 className="w-8 h-8 animate-spin text-white" />
+          </div>
+          <p className="text-sm text-muted-foreground font-medium">Loading SmartPix...</p>
+        </div>
       </div>
     );
   }
@@ -175,7 +148,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="fixed top-4 right-4 z-50">
-        <Button variant="outline" onClick={handleSignOut} className="gap-2">
+        <Button
+          variant="outline"
+          onClick={handleSignOut}
+          className="gap-2 glass rounded-2xl hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all"
+        >
           <LogOut className="w-4 h-4" />
           Sign Out
         </Button>
@@ -194,9 +171,7 @@ const Index = () => {
           accept="image/*"
           onChange={(e) => {
             const files = Array.from(e.target.files || []);
-            if (files.length > 0) {
-              handleFileUpload(files);
-            }
+            if (files.length > 0) handleFileUpload(files);
           }}
         />
       </div>
@@ -206,10 +181,13 @@ const Index = () => {
       </div>
 
       {uploading && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-card p-8 rounded-2xl shadow-2xl text-center">
-            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-lg font-medium">Analyzing photos with AI...</p>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-xl flex items-center justify-center z-50">
+          <div className="glass-strong p-10 rounded-3xl shadow-2xl text-center max-w-sm">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: "var(--gradient-primary)" }}>
+              <Loader2 className="w-8 h-8 animate-spin text-white" />
+            </div>
+            <p className="text-lg font-bold font-display mb-1">Analyzing with AI</p>
+            <p className="text-sm text-muted-foreground">Categorizing your photos automatically...</p>
           </div>
         </div>
       )}
